@@ -1,18 +1,20 @@
 package stitcher_on_pills_test
 
 import (
+	"bytes"
 	"io"
 	"strings"
 	"testing"
 )
 
 func TestStitcher(t *testing.T) {
-	t.Run("stitch two readers together", func(t *testing.T) {
+	t.Run("stitch more than two readers together", func(t *testing.T) {
 		s1 := strings.NewReader("Salt")
 		s2 := strings.NewReader("Pay")
-		got := stitch(s1, s2)
+		s3 := strings.NewReader("Rocks")
+		got := stitch(s1, s2, s3)
 
-		want := "SaltPay"
+		want := "SaltPayRocks"
 		if got != want {
 			t.Errorf("got %q, want %q", got, want)
 		}
@@ -20,9 +22,12 @@ func TestStitcher(t *testing.T) {
 
 }
 
-func stitch(s1 io.Reader, s2 io.Reader) string {
-	byteA1, _ := io.ReadAll(s1)
-	byteA2, _ := io.ReadAll(s2)
+func stitch(readers ...io.Reader) string {
+	var buf bytes.Buffer
+	for _, rds := range readers {
+		byteArray, _ := io.ReadAll(rds)
+		buf.Write(byteArray)
+	}
 
-	return string(byteA1) + string(byteA2)
+	return buf.String()
 }

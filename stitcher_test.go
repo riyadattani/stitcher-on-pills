@@ -19,14 +19,12 @@ func TestStitcher(t *testing.T) {
 			t.Errorf("got %q, want %q", got, want)
 		}
 	})
-
 }
 
 func stitch(readers ...io.Reader) string {
 	var buf bytes.Buffer
 	for _, rds := range readers {
-		byteArray, _ := io.ReadAll(rds)
-		buf.Write(byteArray)
+		_, _ = io.Copy(&buf, rds)
 	}
 
 	return buf.String()

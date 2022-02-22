@@ -1,9 +1,7 @@
 package stitcher_on_pills_test
 
 import (
-	"bytes"
-	"io"
-	"net/http"
+	stitcher_on_pills "github.com/riyadattani/stitcher-on-pills"
 	"strings"
 	"testing"
 )
@@ -13,7 +11,7 @@ func TestStitcher(t *testing.T) {
 		s1 := strings.NewReader("Salt")
 		s2 := strings.NewReader("Pay")
 		s3 := strings.NewReader("Rocks")
-		got := stitch(s1, s2, s3)
+		got := stitcher_on_pills.Stitch(s1, s2, s3)
 
 		want := "SaltPayRocks"
 		if got != want {
@@ -27,7 +25,7 @@ func TestStitchURLS(t *testing.T) {
 
 		url2 := "https://www.riyadattani.com"
 		url1 := "https://www.quii.dev"
-		got := stitchersURL(url1, url2)
+		got := stitcher_on_pills.StitchersURL(url1, url2)
 
 		want := "Deep dive into pair programming"
 		if !strings.Contains(got, want) {
@@ -39,25 +37,4 @@ func TestStitchURLS(t *testing.T) {
 			t.Errorf("did not have %q in %q", want2, got)
 		}
 	})
-}
-
-func stitchersURL(urls ...string) string {
-	var responses []io.Reader
-	for _, url := range urls {
-		res, _ := http.Get(url)
-		defer res.Body.Close()
-
-		responses = append(responses, res.Body)
-	}
-
-	return stitch(responses...)
-}
-
-func stitch(readers ...io.Reader) string {
-	var buf bytes.Buffer
-	for _, rds := range readers {
-		_, _ = io.Copy(&buf, rds)
-	}
-
-	return buf.String()
 }
